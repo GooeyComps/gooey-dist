@@ -26,8 +26,8 @@ This will parse, interpret, and run all text currently in the run queue. Will no
 Pass in a string of Gooey text to be run after initial definitions have been processed. Will return once definitions have been executed.
 #### `gooey.register_function(f)`
 Pass in a Python function to be stored in the current Gooey interpreting instance.
-#### `gooey.register_function(f)`
-Pass in the Gooey variable name, returns the Tkinter widget that was created during the initial run() cycle.
+#### `gooey.get(varname)`
+Pass in a Gooey variable name. Will return the Tkinter widget that was assigned to `varname` during the initial run() cycle.
 
 
 
