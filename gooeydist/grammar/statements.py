@@ -1,4 +1,4 @@
-from .pypeg2 import *
+from ..pypeg2 import *
 from .attributes import *
 #Starts with a lowercase letter, can only be one word long,
 #only contain letters, numbers, or underscore

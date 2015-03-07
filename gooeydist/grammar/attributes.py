@@ -1,4 +1,4 @@
-from .pypeg2 import *
+from ..pypeg2 import *
 
 #   SYMBOL DEFINITIONS: regex, Symbol, str, and Keyword
 rgbRegex = re.compile('\(\d{1,3}\,\s*\d{1,3}\,\s*\d{1,3}\)')

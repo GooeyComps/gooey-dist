@@ -1,9 +1,7 @@
-from .interpreter import *
+from .interpreter import interpreter
 from .pypeg2 import *
-from .statements import *
+from .grammar import statements
 from tkinter import *
-from tkinter.scrolledtext import *
-from tkinter import font
 import os.path
 
 
@@ -11,7 +9,7 @@ class Gooey():
 	def __init__(self):
 		self.window = GUIWindow()
 		self.window.window.withdraw()
-		self.interpreter = Interpreter(self.window.window,None,dict())
+		self.interpreter = interpreter.Interpreter(self.window.window,None,dict())
 		self.input_string = ""
 		
 	def read_file(self, f):
@@ -23,64 +21,44 @@ class Gooey():
 	def add_function(self, f):
 		b = self.interpreter.makeBinding("function", f.__name__, f)
 		self.interpreter.bindings = self.interpreter.addBinding(b)
+		
+	def get_component(self,v):
+		c = self.interpreter.get_by_varname(v)
+		return c
 
 	def run_input(self, s):
 		try:
-			ast = parse(s, Program)
+			ast = parse(s, statements.Program)
 			self.interpreter.interpret(ast)
+			self.input_string = ""
 		except SyntaxError as e:
 		    print("Syntax error", e)
 		    sys.exit(0)
-		except GooeyError as gooey_error:
+		except interpreter.GooeyError as gooey_error:
 		    print("Oops: ", gooey_error)
 		    sys.exit(0)
 		self.window.window.mainloop()
 		
-		
+	def update(self,s):
+		try:
+			ast = parse(s, statements.Program)
+			self.interpreter.interpret(ast)
+			self.input_string = ""
+			return True
+		except SyntaxError as e:
+		    print("Syntax error", e)
+		    sys.exit(0)
+		except interpreter.GooeyError as gooey_error:
+		    print("Oops: ", gooey_error)
+		    sys.exit(0)
+		self.window.window.mainloop()
 
 class GUIWindow():
-    '''
-    Wrapper class for the live preview window
-    '''
     def __init__(self):
-        '''
-        Initializes preview window, bindings, and master window binding.
-        '''
         self.window = Tk(className="Live Preview")
         self.window.resizable(width=False, height=False)
         m = Menu(self.window)
         self.window.config(menu=m)
-
-        self.bindings = dict()
-        # Keep track of the binding linked to our master window
-        self.winBinding = None
-        self.is_open = False
-
-    def openWindow(self):
-        '''
-        Open the preview window.
-        '''
-        self.is_open = True
-        self.window.deiconify()
-
-    def stop(self):
-        '''
-        Close the preview window.
-        '''
-        self.is_open = False
-
-    def modify(self, gooeyCode):
-        '''
-        Takes string Gooey code, parses and interprets it, and updates the preview window.
-        Throws SyntaxError if syntax is incorrect, or GooeyError if there is an interpreter error.
-        '''
-        #create new instance of interpeter class, passing a reference the live preview window
-        i = Interpreter(self.window,self.winBinding,self.bindings)
-
-        ast = parse(gooeyCode, Program)
-
-        (self.bindings,self.winBinding) = i.interpret(ast)
-        del i
 
 
 def read(s):
@@ -93,8 +71,27 @@ def read(s):
 	else:
 		g.read_string(s)
 
-def read_lazy(s):
-	g.run_input(s)
+	
+def get(varname):
+	c = g.get_component(varname)
+	if c:
+		return c
+	else: 
+		print(varname, "undefined")
+		return False
+		
+def update(s):
+	if os.path.isfile(s):
+		try:
+			f = open(s, "r")
+			g.update(f.read())
+			return True
+		except IOError:
+			print("Could not read input file.")
+			return False
+	else:
+		g.update(s)
+		return True
 	
 
 def register_function(func):

@@ -1,10 +1,10 @@
 from tkinter import *
-from .pypeg2 import *
+from ..pypeg2 import *
 from .actionbuttons import *
 import sys
 from .matrix import *
 import math
-from .gooey import *
+from ..gooey import *
 
 import os
 
@@ -1708,7 +1708,13 @@ class Interpreter():
         '''Takes a binding and adds to the dictionary of bindings.'''
         self.bindings[b.varname] = b
         return self.bindings
-
+    def get_by_varname(self,v):
+        if v in self.bindings:
+            return self.bindings[v].bObject
+        else:
+            return False
+		
+		
     def getFunctionLineAction(self, expr):
         '''Interprets one line of a function, returns the action that line does.'''
     #        if(expr.__class__.__name__ == "Return"):
